@@ -1,5 +1,6 @@
 import { ref, watch, computed } from '@vue/composition-api'
 import store from '@/store'
+import Vue from 'vue'
 // import router from '@/router'
 
 // Notification
@@ -55,7 +56,7 @@ export default function useApiOutboxList() {
     isBusy.value = true
     store
       .dispatch('outbox/fetchOutboxList', {
-        org_id: JSON.parse(localStorage.getItem('userData')).membership.organisation_id,
+        org_id: JSON.parse(JSON.stringify(Vue.$cookies.get('userData').membership.organisation_id)),
         q: searchQuery.value,
         per_page: perPage.value,
         page: currentPage.value,

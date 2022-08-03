@@ -6,7 +6,9 @@
       :class="{'show': mqShallShowLeftSidebar}"
       @click="mqShallShowLeftSidebar = false"
     />
-    <div class="mx-2 mb-1 mt-1">
+    <!-- Email List -->
+    <div class="email-app-list">
+    <div class="mx-2 mt-1 mb-1">
       <b-row class="row">
          <!-- Searchbar -->
          <b-col
@@ -36,6 +38,7 @@
         >
         <span class="text-muted ml-auto mr-2 align-items-center">Showing {{ dataMeta.from }} to {{ dataMeta.to }} of {{ dataMeta.of }} entries</span>
           <b-pagination
+            v-if="showCampaignDetails === false"
             v-model="currentPage"
             :total-rows="totalCampaigns"
             :per-page="perPage"
@@ -61,8 +64,35 @@
         </b-col>
       </b-row>
     </div>
+
+     <!-- App Action Bar -->
+      <div class="app-action">
+        <div class="action-left">
+          <b-form-checkbox
+            :checked="selectAllCampaignCheckbox"
+            :indeterminate="isSelectAllCampaignCheckboxIndeterminate"
+            @change="selectAllCheckboxUpdate"
+          >
+            Select All
+          </b-form-checkbox>
+        </div>
+        <div
+          v-show="selectedCampaigns.length"
+          class="align-items-center"
+          :class="{'d-flex': selectedCampaigns.length}"
+        >
+          <feather-icon
+            v-show="$route.params.folder !== 'trash'"
+            icon="TrashIcon"
+            size="17"
+            class="cursor-pointer ml-1"
+            @click="deleteCampaigns"
+          />
+
+        </div>
+      </div>
     <!-- Email List -->
-    <div class="email-app-list">
+    <div class="email-app-list mt-1">
 
       <!-- App Searchbar Header -->
       <div class="app-fixed-search d-flex align-items-center">
@@ -96,7 +126,7 @@
               <div class="user-action">
                 <b-form-checkbox
                   :checked="selectedCampaigns.includes(campaign.id)"
-                  @change="toggleSelectedMail(campaign.id)"
+                  @change="toggleSelectedCampaign(campaign.id)"
                   @click.native.stop
                 />
                 <!-- <div class="email-favorite">
@@ -140,6 +170,7 @@
         </div>
       </vue-perfect-scrollbar>
     </div>
+    </div>
 
     <!-- Email View/Detail -->
     <campaign-view
@@ -167,6 +198,7 @@
 
 <script>
 import store from '@/store'
+import Vue from 'vue'
 import {
   ref, onUnmounted, computed, watch,
   // ref, watch, computed, onUnmounted,
@@ -180,6 +212,8 @@ import VuePerfectScrollbar from 'vue-perfect-scrollbar'
 import { filterTags, formatDateToMonthShort } from '@core/utils/filter'
 import { useRouter } from '@core/utils/utils'
 import { useResponsiveAppLeftSidebarVisibility } from '@core/comp-functions/ui/app'
+import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
+import { useToast } from 'vue-toastification/composition'
 import EmailLeftSidebar from './EmailLeftSidebar.vue'
 import CampaignView from './CampaignView.vue'
 import campaignStoreModule from './campaignStoreModule'
@@ -217,6 +251,7 @@ export default {
     const totalCampaigns = ref(0)
     const currentPage = ref(1)
     const CAMPAIGNS_STORE_MODULE_NAME = 'campaigns'
+    const membership = ref(JSON.parse(JSON.stringify(Vue.$cookies.get('userData').membership)))
 
     // Register module
     if (!store.hasModule(CAMPAIGNS_STORE_MODULE_NAME)) store.registerModule(CAMPAIGNS_STORE_MODULE_NAME, campaignStoreModule)
@@ -238,6 +273,7 @@ export default {
     // Campaigns & CampaignsMeta
     const campaigns = ref([])
     const campaignsMeta = ref({})
+    const toast = useToast()
 
     const perfectScrollbarSettings = {
       maxScrollbarLength: 150,
@@ -273,7 +309,7 @@ export default {
       store.dispatch('campaigns/fetchCampaigns', {
         q: searchQuery.value,
         state: router.currentRoute.params.state,
-        org_id: JSON.parse(localStorage.getItem('userData')).membership.organisation_id,
+        org_id: membership.value.organisation_id,
         per_page: perPage.value,
         page: currentPage.value,
       })
@@ -293,6 +329,27 @@ export default {
     // Mail Selection
     // ------------------------------------------------
     const selectedCampaigns = ref([])
+    const deleteCampaigns = () => {
+      const postData = {
+        campaign_ids: JSON.parse(JSON.stringify(selectedCampaigns.value)),
+        org_id: membership.value.organisation_id,
+      }
+      console.log('Post Data', postData)
+      store.dispatch('campaigns/deleteCampaigns', postData)
+        .then(response => {
+          console.log(response.data)
+          toast({
+            component: ToastificationContent,
+            props: {
+              title: 'Campaigns Deleted Successfully',
+              icon: 'CoffeeIcon',
+              variant: 'success',
+            },
+          })
+          refreshCampaignsData()
+          selectedCampaigns.value = []
+        })
+    }
     const toggleSelectedCampaign = campaignId => {
       const campaignIndex = selectedCampaigns.value.indexOf(campaignId)
 
@@ -388,8 +445,15 @@ export default {
       currentPage,
       totalCampaigns,
       dataMeta,
+      deleteCampaigns,
     }
   },
+  // methods: {
+  //   deleteSelectedCampaigns() {
+  //     this.deleteCampaigns()
+  //     console.log('selected', JSON.parse(JSON.stringify(this.selectedCampaigns)))
+  //   },
+  // },
 }
 </script>
 

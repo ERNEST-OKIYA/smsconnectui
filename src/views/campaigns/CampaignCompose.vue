@@ -11,10 +11,8 @@
     ok-only
     ok-variant="default"
     ok-title=""
-    hide-backdrop
-    header-bg-variant="warning"
-    header-border-variant="warning"
     header-text-variant="secondary"
+    header-bg-variant=""
     @change="(val) => $emit('update:shall-show-email-compose-modal', val)"
   >
     <!-- Modal Header -->
@@ -26,16 +24,16 @@
         <feather-icon
           icon="MinusIcon"
           class="cursor-pointer"
-          @click="$emit('update:shall-show-email-compose-modal', false)"
+          @click="discardComposeMessage"
         />
-        <feather-icon
+        <!-- <feather-icon
           icon="Maximize2Icon"
           class="ml-1 cursor-pointer"
-        />
+        /> -->
         <feather-icon
           icon="XIcon"
           class="ml-1 cursor-pointer"
-          @click="discardMessage"
+          @click="discardComposeMessage"
         />
       </div>
     </template>
@@ -46,7 +44,7 @@
 
 <script>
 import Ripple from 'vue-ripple-directive'
-import { ref, watch } from '@vue/composition-api'
+import { ref, watch, toRefs } from '@vue/composition-api'
 import axios from '@axios'
 import router from '@/router'
 import CommposeWizard from './compose-wizard/ComposeWizard.vue'
@@ -75,42 +73,18 @@ export default {
     },
   },
   setup(props, { emit }) {
-    const composeData = ref({})
-    const composeTo = ref({})
     const showFooter = ref(false)
-    /* eslint-enable global-require */
-    const sendMessage = () => {
-      // composeData.value = {}
-      emit('update:shall-show-email-compose-modal', false)
-      const groups = JSON.parse(JSON.stringify(composeData.value.to))
-      const groupIds = []
-      groups.forEach(group => {
-        groupIds.push(group.id)
-      })
-      const postData = {
-        message: composeData.value.message,
-        subject: composeData.value.subject,
-        groups: groupIds,
-      }
-      axios.post('/campaigns/create', postData).then(res => {
-        console.log('SENT', res.data)
-        composeData.value = {}
-      })
-        .catch(res => {
-          console.log('ERROR OCCURED', res.data)
-        })
-    }
-
-    const discardMessage = () => {
-      composeData.value = {}
-      emit('update:shall-show-email-compose-modal', false)
-    }
+    const composeTo = ref({})
+    const toGroupRef = toRefs(props).to
     const closeModal = () => {
       emit('update:shall-show-email-compose-modal', false)
-      router.push({ name: 'bulk-campaigns-state', params: { state: 0 } })
+      router.push({ name: 'bulk-campaigns-state', params: { state: 1 } })
+    }
+    const discardComposeMessage = () => {
+      emit('update:shall-show-email-compose-modal', false)
     }
     const pushToGroups = () => {
-      axios.get(`address-books/group/${props.to}`).then(res => {
+      axios.get(`address-books/group/${toGroupRef.value}`).then(res => {
         composeTo.value = res.data
         emit('update:shall-show-email-compose-modal', true)
       })
@@ -118,18 +92,16 @@ export default {
           console.log('ERROR OCCURED', res.data)
         })
     }
-    watch(() => props.to, () => {
-      if (props.to !== null) {
+    watch(() => toGroupRef.value, () => {
+      if (toGroupRef.value !== null) {
         pushToGroups()
       }
     })
     return {
-      composeData,
       // Campaign actions
-      sendMessage,
-      discardMessage,
       showFooter,
       closeModal,
+      discardComposeMessage,
       composeTo,
     }
   },

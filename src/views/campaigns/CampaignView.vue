@@ -34,7 +34,11 @@
       </b-row>
       <!-- Label Row -->
       <b-row>
-        <b-col cols="12">
+        <b-col
+        lg="9"
+        sm="12"
+        md="9"
+        >
           <div class="email-label">
             <b-badge
               pill
@@ -43,6 +47,36 @@
             >
               {{ resolveLabelName(emailViewData.state) }}
             </b-badge>
+          </div>
+        </b-col>
+        <b-col
+        lg="3"
+        sm="12"
+        md="3"
+        >
+          <div
+          v-if="emailViewData.state === 2"
+          class="email-label">
+
+            <span>
+               Will start at: {{ emailViewData.started_at }}
+            </span>
+          </div>
+          <div
+          v-if="emailViewData.state != 2 && emailViewData.state != 0"
+          class="email-label">
+
+            <span>
+               Started at: {{ emailViewData.created_at }}
+            </span>
+          </div>
+          <div
+          v-if="emailViewData.state === 0"
+          class="email-label">
+
+            <span>
+               Not Started
+            </span>
           </div>
         </b-col>
       </b-row>

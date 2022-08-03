@@ -122,11 +122,48 @@
               </b-form-group>
             </b-col>
           </b-row>
-          <!-- <b-row>
-            <div v-for="field in groups[4].custom_fields" :key="field.id">
-              <p class="ml-2">{{field}}</p>
-            </div>
-          </b-row> -->
+          <div v-if="placeHolders.length > 0">
+          <b-row>
+            <b-col
+              cols="12"
+              class="mt-1"
+            >
+              <h5 class="mb-0">
+                Place Holders:
+              </h5>
+            </b-col>
+          </b-row>
+          <ul
+          id="my-custom-tags-list"
+          class="list-unstyled d-inline-flex flex-wrap mb-0"
+          aria-live="polite"
+          aria-atomic="false"
+          aria-relevant="additions removals"
+        >
+          <!-- Always use the tag value as the :key, not the index! -->
+          <!-- Otherwise screen readers will not read the tag
+             additions and removals correctly -->
+          <b-card
+            v-for="tag in placeHolders"
+            :id="`my-custom-tags-tag_${tag.replace(/\s/g, '_')}_`"
+            :key="tag"
+            tag="li"
+            class="shadow-none border mt-1 mr-1 mb-1"
+            body-class="py-1 pr-2 text-nowrap"
+          >
+            <strong>{{ tag }}</strong>
+            <b-button
+              variant="link"
+              size="sm"
+              :aria-controls="`my-custom-tags-tag_${tag.replace(/\s/g, '_')}_`"
+              class="py-0"
+              @click="insertTag(tag)"
+            >
+              insert
+            </b-button>
+          </b-card>
+        </ul>
+          </div>
           <b-row>
             <b-col md="12">
               <validation-provider
@@ -140,6 +177,7 @@
                   :state="errors.length > 0 ? false:null"
                 >
                   <b-form-textarea
+                    ref="refMessage"
                     id="message"
                     v-model="composeData.message"
                     placeholder="Message"
@@ -263,6 +301,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { FormWizard, TabContent } from 'vue-form-wizard'
 import vSelect from 'vue-select'
 import flatPickr from 'vue-flatpickr-component'
@@ -280,12 +319,13 @@ import {
   BAlert,
   BBadge,
   BFormCheckbox,
+  BButton,
+  BCard,
 } from 'bootstrap-vue'
 
 import {
   ref,
   onBeforeMount,
-  onUnmounted,
   computed,
 } from '@vue/composition-api'
 
@@ -296,7 +336,6 @@ import axios from '@axios'
 import { useToast } from 'vue-toastification/composition'
 import { required } from '@validations'
 import { codeIcon } from './code'
-import campaignStoreModule from '../campaignStoreModule'
 
 export default {
   components: {
@@ -314,9 +353,14 @@ export default {
     vSelect,
     BFormInvalidFeedback,
     BFormCheckbox,
+    BButton,
+    BCard,
     // eslint-disable-next-line vue/no-unused-components
     ToastificationContent,
     flatPickr,
+  },
+  directives: {
+    Ripple,
   },
   props: {
     to: {
@@ -326,14 +370,6 @@ export default {
     },
   },
   setup(props, { emit }) {
-    const CAMPAIGN_STORE_MODULE_NAME = 'campaigns'
-    // Register module
-    if (!store.hasModule(CAMPAIGN_STORE_MODULE_NAME)) store.registerModule(CAMPAIGN_STORE_MODULE_NAME, campaignStoreModule)
-
-    // UnRegister on leave
-    onUnmounted(() => {
-      if (store.hasModule(CAMPAIGN_STORE_MODULE_NAME)) store.unregisterModule(CAMPAIGN_STORE_MODULE_NAME)
-    })
     const toast = useToast()
     const blankComposeData = {
       sender: '',
@@ -344,6 +380,7 @@ export default {
       sendAtTime: null,
     }
     const groups = ref([])
+    const membership = JSON.parse(JSON.stringify(Vue.$cookies.get('userData').membership))
     const totalGroups = ref(0)
     const composeData = ref(JSON.parse(JSON.stringify(blankComposeData)))
     const resetComposeData = () => {
@@ -351,7 +388,9 @@ export default {
     }
     const fetchGroups = () => {
       store
-        .dispatch('campaigns/fetchCampaignGroups')
+        .dispatch('campaigns/fetchCampaignGroups', {
+          org_id: membership.organisation_id,
+        })
         .then(response => {
           const { results, count } = response.data
           totalGroups.value = count
@@ -382,16 +421,16 @@ export default {
         sender: composeData.value.sender,
         sendAtDate: composeData.value.sendAtDate,
         sendAtTime: composeData.value.sendAtTime,
-        org_id: JSON.parse(localStorage.getItem('userData')).membership.organisation_id,
+        org_id: membership.organisation_id,
       }
       axios.post('/campaigns/create', postData).then(res => {
-        console.log('campaign create res', res)
+        console.log(res.data)
         resetComposeData()
         // composeData.value = {}
         emit('close-compose-modal')
       })
         .catch(res => {
-          console.log('ERROR OCCURED', res.data)
+          console.log('ERROR OCCURED', res)
         })
     }
     // eslint-disable-next-line arrow-body-style
@@ -408,6 +447,12 @@ export default {
       }
       return 0
     })
+    const placeHolders = computed(() => {
+      if (composeData.value.to.length > 0 && composeData.value.to !== undefined) {
+        return composeData.value.to.reduce((tt, to) => tt.concat(to.custom_fields), [])
+      }
+      return []
+    })
     onBeforeMount(fetchGroups)
     return {
       composeData,
@@ -417,6 +462,7 @@ export default {
       estimateUnits,
       numOfContacts,
       SubmitForm,
+      placeHolders,
     }
   },
   data() {
@@ -428,13 +474,37 @@ export default {
       senders: [],
     }
   },
-  directives: {
-    Ripple,
-  },
   methods: {
+    insertTag(tag) {
+      const tArea = this.$refs.refMessage
+      // get cursor's position:
+      const startPos = tArea.selectionStart
+      const endPos = tArea.selectionEnd
+      let cursorPos = startPos
+      const tmpStr = tArea.value
+      // filter:
+      if (tag === 0) {
+        return
+      }
+      if (cursorPos === -1) {
+        return
+      }
+      // insert:
+      this.composeData.message = `${tmpStr.substring(0, startPos)}{${tag}}${tmpStr.substring(endPos, tmpStr.length)}`
+
+      // move cursor:
+      setTimeout(() => {
+        cursorPos += tag.length
+        tArea.selectionStart = tArea.selectionEnd
+      }, 10)
+    },
     fetchSenders() {
       store
-        .dispatch('campaigns/fetchOrganisationSenders', { orgId: JSON.parse(localStorage.getItem('userData')).membership.organisation_id })
+        .dispatch('campaigns/fetchOrganisationSenders', {
+          orgId: JSON.parse(JSON.stringify(this.$cookies.get('userData').membership.organisation_id)),
+          type: 1,
+          is_active: true,
+        })
         .then(response => {
           this.senders = response.data.results
         })

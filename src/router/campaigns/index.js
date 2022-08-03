@@ -18,10 +18,10 @@ export default [
     meta: {
       contentRenderer: 'sidebar-left',
       contentClass: 'email-application',
-      navActiveLink: 'bulk-campaign',
+      navActiveLink: 'bulk-campaigns',
     },
     beforeEnter(to, _, next) {
-      if ([0, 1, 2, 3, 4, 5].includes(to.params.state)) next()
+      if ([0, 1, 2, 3, 4, 5, 6, 7].includes(to.params.state)) next()
       else next({ name: 'error-404' })
     },
   },

@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import { ToastPlugin, ModalPlugin } from 'bootstrap-vue'
 import VueCompositionAPI from '@vue/composition-api'
+import VueCookies from 'vue-cookies'
+import { Upload, Button } from 'element-ui'
 
 // import i18n from '@/libs/i18n'
 import router from './router'
@@ -19,13 +21,13 @@ import '@/libs/toastification'
 import '@/libs/sweet-alerts'
 import '@/libs/vue-select'
 
-
 // Axios Mock Adapter
 import '@/@fake-db/db'
 
 // Element UI
 
-import { Upload, Button } from 'element-ui';
+// cookies
+Vue.use(VueCookies)
 
 // BSV Plugin Registration
 Vue.use(ToastPlugin)

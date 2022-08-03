@@ -32,7 +32,7 @@
         padding-bottom: 2rem;
         &.active {
           a {
-            color: $primary;
+            color: #C70039;
             .wizard-icon-circle {
               .wizard-icon-container {
                 .wizard-icon {
@@ -111,6 +111,8 @@
         padding: 0.786rem 1.5rem;
         min-width: unset;
         border-radius: 0.4285rem;
+        background-color: #C70039;
+        background-color: #C70039;
       }
     }
     .wizard-footer-left {
@@ -139,8 +141,10 @@
     .wizard-footer-right {
       .wizard-btn {
         font-weight: 400;
+        background-color: #C70039 !important;
+        border: 1px solid #C70039 !important;
         &:hover {
-          box-shadow: 0 8px 25px -8px $primary;
+          box-shadow: 0 8px 25px -8px #C70039;
         }
         &::after {
           content: '\e844';

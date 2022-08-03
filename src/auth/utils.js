@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import useJwt from '@/auth/jwt/useJwt'
 
 /**
@@ -7,10 +8,10 @@ import useJwt from '@/auth/jwt/useJwt'
  */
 // eslint-disable-next-line arrow-body-style
 export const isUserLoggedIn = () => {
-  return localStorage.getItem('userData') && localStorage.getItem(useJwt.jwtConfig.storageTokenKeyName)
+  return Vue.$cookies.get('userData') && Vue.$cookies.get(useJwt.jwtConfig.storageTokenKeyName)
 }
 
-export const getUserData = () => JSON.parse(localStorage.getItem('userData'))
+export const getUserData = () => JSON.parse(JSON.stringify(Vue.$cookies.get('userData')))
 
 /**
  * This function is used for demo purpose route navigation
@@ -21,7 +22,7 @@ export const getUserData = () => JSON.parse(localStorage.getItem('userData'))
  * @param {String} userRole Role of user
  */
 export const getHomeRouteForLoggedInUser = userRole => {
-  if (userRole === 'admin') return { name: 'home' }
-  if (userRole === 'client') return { name: 'access-control' }
+  if (userRole === 'Admin') return { name: 'home' }
+  if (userRole === 'Member') return { name: 'home' }
   return { name: 'auth-login' }
 }

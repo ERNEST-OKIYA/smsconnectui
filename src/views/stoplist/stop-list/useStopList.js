@@ -1,5 +1,6 @@
 import { ref, watch, computed } from '@vue/composition-api'
 import store from '@/store'
+import Vue from 'vue'
 // import router from '@/router'
 
 // Notification
@@ -27,7 +28,7 @@ export default function useStopList() {
   const sendersFilter = ref(null)
   const isSortDirDesc = ref(true)
   const isBusy = ref(false)
-
+  const membership = ref(JSON.parse(JSON.stringify(Vue.$cookies.get('userData').membership)))
   const dataMeta = computed(() => {
     const localItemsCount = refStoplistListTable.value ? refStoplistListTable.value.localItems.length : 0
     return {
@@ -49,7 +50,7 @@ export default function useStopList() {
     isBusy.value = true
     store
       .dispatch('stoplists/fetchOrganisationStopList', {
-        orgId: JSON.parse(localStorage.getItem('userData')).membership.organisation_id,
+        orgId: membership.organisation_id,
         q: searchQuery.value,
         per_page: perPage.value,
         page: currentPage.value,

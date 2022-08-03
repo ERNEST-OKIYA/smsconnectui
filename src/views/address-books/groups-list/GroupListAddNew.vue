@@ -3,6 +3,7 @@
     id="add-new-group-sidebar"
     :visible="isAddNewGroupSidebarActive"
     bg-variant="white"
+    header-class="danger"
     sidebar-class="sidebar-lg"
     shadow
     backdrop
@@ -105,6 +106,7 @@
                 :reduce="val => val.value"
                 :clearable="false"
                 input-id="group-type"
+                disabled
               />
               <b-form-invalid-feedback :state="getValidationState(validationContext)">
                 {{ validationContext.errors[0] }}
@@ -126,6 +128,7 @@
                 input-id="custom-fields"
                 placeholder="Add a custom Field"
                 class="mb-2"
+                disabled
               />
               <p> Custom Fields: {{ groupData.custom_fields }}</p>
               <b-form-invalid-feedback>
@@ -136,7 +139,7 @@
           <div class="d-flex mt-2">
             <b-button
               v-ripple.400="'rgba(255, 255, 255, 0.15)'"
-              variant="primary"
+              variant="danger"
               class="mr-2"
               type="submit"
             >
@@ -169,6 +172,7 @@ import formValidation from '@core/comp-functions/forms/form-validation'
 import Ripple from 'vue-ripple-directive'
 import vSelect from 'vue-select'
 import store from '@/store'
+import Vue from 'vue'
 import { useToast } from 'vue-toastification/composition'
 import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
 
@@ -214,13 +218,14 @@ export default {
     },
   },
   setup(props, { emit }) {
+    const membership = JSON.parse(JSON.stringify(Vue.$cookies.get('userData').membership))
     const blankGroupData = {
       name: '',
       description: '',
       email: '',
       type: 1,
       custom_fields: [],
-      org_id: JSON.parse(localStorage.getItem('userData')).membership.organisation_id,
+      org_id: membership.organisation_id,
     }
 
     const typeOptions = [

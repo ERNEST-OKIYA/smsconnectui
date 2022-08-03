@@ -1,5 +1,6 @@
 import { ref, watch, computed } from '@vue/composition-api'
 import store from '@/store'
+import Vue from 'vue'
 // import router from '@/router'
 
 // Notification
@@ -15,9 +16,9 @@ export default function useSendersList() {
   const tableColumns = [
     // { key: 'campaign', sortable: true },
     { key: 'name', sortable: true },
-    // { key: 'type', sortable: true },
     { key: 'code', label: 'Profile Code', sortable: true },
     { key: 'type_name', label: 'Type', sortable: true },
+    { key: 'status', sortable: true },
     { key: 'created_at', label: 'Assigned On', sortable: true },
     // { key: 'actions' },
   ]
@@ -52,7 +53,7 @@ export default function useSendersList() {
     isBusy.value = true
     store
       .dispatch('senders/fetchOrganisationSenders', {
-        orgId: JSON.parse(localStorage.getItem('userData')).membership.organisation_id,
+        orgId: JSON.parse(JSON.stringify(Vue.$cookies.get('userData').membership.organisation_id)),
         q: searchQuery.value,
         per_page: perPage.value,
         page: currentPage.value,
@@ -88,6 +89,11 @@ export default function useSendersList() {
     if (type === 'Transactional') return { variant: 'warning', icon: 'MailIcon' }
     return { variant: 'success', icon: 'PhoneIcon' }
   }
+  const resolveSenderStatusVariantAndIcon = type => {
+    if (type === 'Active') return { variant: 'success', icon: 'PhoneIcon' }
+    if (type === 'Deactivated') return { variant: 'danger', icon: 'MailIcon' }
+    return { variant: 'success', icon: 'PhoneIcon' }
+  }
   return {
     fetchSenders,
     perPage,
@@ -104,6 +110,7 @@ export default function useSendersList() {
     tableColumns,
 
     resolveSenderTypeVariantAndIcon,
+    resolveSenderStatusVariantAndIcon,
     refetchData,
     isBusy,
   }

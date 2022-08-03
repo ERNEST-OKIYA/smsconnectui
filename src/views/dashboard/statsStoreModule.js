@@ -6,7 +6,7 @@ export default {
   getters: {},
   mutations: {},
   actions: {
-    fetchDeliveryReport(ctx, payload) {
+    fetchReport(ctx, payload) {
       return new Promise((resolve, reject) => {
         axios
           .get('/stats/delivery-report', { params: payload })

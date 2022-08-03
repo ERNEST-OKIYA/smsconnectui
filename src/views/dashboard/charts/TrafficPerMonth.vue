@@ -1,24 +1,35 @@
 <template>
   <div>
-    <b-card no-body>
-    <b-card-header class="align-items-right">
-      <!-- datepicker -->
-      <div class="d-flex align-items-center"
+    <!-- datepicker -->
+    <b-row class="match-height">
+      <!-- Per Page -->
+        <b-col
+          cols="12"
+          md="6"
+          lg="4"
+          sm="6"
+        >
+      <div class="d-flex align-items-center mb-2"
       style="margin-right:0px;"
       >
         <feather-icon
           icon="CalendarIcon"
           size="16"
+          class="mr-1 text-success"
         />
         <flat-pickr
           v-model="rangePicker"
           @on-close="refetchData"
           :config="config"
-          class="form-control flat-picker bg-transparent border-0 shadow-none"
-          placeholder="Select Date Range"
+          class="form-control flat-picker shadow-none"
+          placeholder="Select Report Date"
         />
       </div>
+    </b-col>
+    </b-row>
       <!-- datepicker -->
+    <b-card no-body>
+    <b-card-header class="align-items-right">
     </b-card-header>
 
     <!-- charts -->
@@ -36,9 +47,11 @@ import {
   BCard,
   BCardHeader,
   BCardBody,
+  BRow,
+  BCol,
 } from 'bootstrap-vue'
 import flatPickr from 'vue-flatpickr-component'
-// import moment from 'moment'
+import moment from 'moment'
 import { $themeColors } from '@themeConfig'
 import ChartjsBarChart from './ChartjsBarChart.vue'
 
@@ -67,14 +80,18 @@ export default {
     BCardBody,
     flatPickr,
     ChartjsBarChart,
+    BCol,
+    BRow,
   },
   data() {
     return {
       rangePicker: null,
       config: {
         mode: 'range',
+        dateFormat: 'Y-m-d',
+        allowInput: true,
       },
-      userData: JSON.parse(localStorage.getItem('userData')),
+      userData: JSON.parse(JSON.stringify(this.$cookies.get('userData'))),
       loaded: true,
       trafficBarChart: {
         data: {
@@ -120,7 +137,8 @@ export default {
                   zeroLineColor: chartColors.grid_line_color,
                 },
                 scaleLabel: {
-                  display: false,
+                  display: true,
+                  labelString: 'Date Sent',
                 },
                 ticks: {
                   fontColor: chartColors.labelColor,
@@ -134,10 +152,14 @@ export default {
                   color: chartColors.grid_line_color,
                   zeroLineColor: chartColors.grid_line_color,
                 },
+                scaleLabel: {
+                  display: true,
+                  labelString: 'SMS Sent - Traffic',
+                },
                 ticks: {
-                  stepSize: 10000,
+                  stepSize: 10,
                   min: 0,
-                  max: 100000,
+                  max: 100,
                   fontColor: chartColors.labelColor,
                 },
               },
@@ -148,16 +170,19 @@ export default {
     }
   },
   methods: {
-    refetchData(dateStr) {
+    /* eslint-disable */
+    refetchData(selectedDates, dateStr, instance) {
       this.loaded = false
-      const start = String(dateStr[0]).format('YYYY-MM-DD')
-      const end = String(dateStr[1]).format('YYYY-MM-DD')
-      this.$http.get(`/stats/totals/payins-per-month/?created_at_before=${end}&created_at_after=${start}`).then(response => {
-        this.trafficBarChart.data.labels = JSON.parse(JSON.stringify(response.data.graph_data.payin_labels))
-        this.trafficBarChart.data.datasets[0].data = JSON.parse(JSON.stringify(response.data.graph_data.payins_graph_data))
+      const start = moment(new Date(String(selectedDates[0]))).format('YYYY-MM-DD')
+      const end = moment(new Date(String(selectedDates[1]))).format('YYYY-MM-DD')
+      const orgId = this.userData.membership.organisation_id
+      this.$http.get(`/stats/usage-traffic?start=${start}&end=${end}&org_id=${orgId}`).then(response => {
+        this.trafficBarChart.data.labels = JSON.parse(JSON.stringify(response.data.graph_data.labels))
+        this.trafficBarChart.data.datasets[0].data = JSON.parse(JSON.stringify(response.data.graph_data.traffic_graph_data))
         this.loaded = true
       })
     },
+    /* eslint-enable */
   },
 }
 </script>

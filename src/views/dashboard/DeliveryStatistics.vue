@@ -15,7 +15,7 @@
     <b-card-body class="statistics-body">
       <b-row>
         <b-col
-          xl="3"
+          xl="2"
           sm="6"
           class="mb-2 mb-xl-0"
         >
@@ -26,11 +26,12 @@
             >
               <b-avatar
                 size="48"
-                variant="primary"
+                variant="dark"
               >
                 <feather-icon
                   size="24"
-                  icon="TrendingUpIcon"
+                  icon="BarChart2Icon"
+                  class="text-secondary"
                 />
               </b-avatar>
             </b-media-aside>
@@ -39,13 +40,13 @@
                 {{ deliveryReport.total.toLocaleString() }}
               </h4>
               <b-card-text class="font-small-3 mb-0">
-               Sent
+               Traffic
               </b-card-text>
             </b-media-body>
           </b-media>
         </b-col>
         <b-col
-          xl="3"
+          xl="2"
           sm="6"
           class="mb-2 mb-xl-0"
         >
@@ -56,11 +57,12 @@
             >
               <b-avatar
                 size="48"
-                variant="primary"
+                variant="success"
               >
                 <feather-icon
                   size="24"
-                  icon="TrendingUpIcon"
+                  icon="CheckCircleIcon"
+                  class="text-secondary"
                 />
               </b-avatar>
             </b-media-aside>
@@ -75,7 +77,7 @@
           </b-media>
         </b-col>
         <b-col
-          xl="3"
+          xl="2"
           sm="6"
           class="mb-2 mb-xl-0"
         >
@@ -86,11 +88,43 @@
             >
               <b-avatar
                 size="48"
-                variant="primary"
+                variant="warning"
               >
                 <feather-icon
                   size="24"
-                  icon="TrendingUpIcon"
+                  icon="SlashIcon"
+                  class="text-secondary"
+                />
+              </b-avatar>
+            </b-media-aside>
+            <b-media-body class="my-auto">
+              <h4 class="font-weight-bolder mb-0">
+                {{ deliveryReport.undelivered.toLocaleString() }}
+              </h4>
+              <b-card-text class="font-small-3 mb-0">
+               Undelivered
+              </b-card-text>
+            </b-media-body>
+          </b-media>
+        </b-col>
+        <b-col
+          xl="2"
+          sm="6"
+          class="mb-2 mb-xl-0"
+        >
+          <b-media no-body>
+            <b-media-aside
+
+              class="mr-2"
+            >
+              <b-avatar
+                size="48"
+                variant="danger"
+              >
+                <feather-icon
+                  size="24"
+                  icon="XCircleIcon"
+                  class="text-dark"
                 />
               </b-avatar>
             </b-media-aside>
@@ -105,7 +139,38 @@
           </b-media>
         </b-col>
         <b-col
-          xl="3"
+          xl="2"
+          sm="6"
+          class="mb-2 mb-xl-0"
+        >
+          <b-media no-body>
+            <b-media-aside
+
+              class="mr-2"
+            >
+              <b-avatar
+                size="48"
+                variant="secondary"
+              >
+                <feather-icon
+                  size="24"
+                  icon="ClockIcon"
+                  class="text-dark"
+                />
+              </b-avatar>
+            </b-media-aside>
+            <b-media-body class="my-auto">
+              <h4 class="font-weight-bolder mb-0">
+                {{ deliveryReport.queued.toLocaleString() }}
+              </h4>
+              <b-card-text class="font-small-3 mb-0">
+               Pending
+              </b-card-text>
+            </b-media-body>
+          </b-media>
+        </b-col>
+        <b-col
+          xl="2"
           sm="6"
           class="mb-2 mb-xl-0"
         >
@@ -120,7 +185,7 @@
               >
                 <feather-icon
                   size="24"
-                  icon="TrendingUpIcon"
+                  icon="MessageSquareIcon"
                 />
               </b-avatar>
             </b-media-aside>
@@ -143,11 +208,6 @@
 import {
   BCard, BCardHeader, BCardText, BCardBody, BRow, BCol, BMedia, BMediaAside, BAvatar, BMediaBody, BCardSubTitle,
 } from 'bootstrap-vue'
-import {
-  ref, onUnmounted,
-} from '@vue/composition-api'
-import store from '@/store'
-import statsStoreModule from './statsStoreModule'
 
 export default {
   components: {
@@ -163,47 +223,11 @@ export default {
     BMediaBody,
     BCardSubTitle,
   },
-  setup() {
-    const STATS_STORE_MODULE_NAME = 'stats'
-    // Register module
-    if (!store.hasModule(STATS_STORE_MODULE_NAME)) store.registerModule(STATS_STORE_MODULE_NAME, statsStoreModule)
-
-    // UnRegister on leave
-    onUnmounted(() => {
-      if (store.hasModule(STATS_STORE_MODULE_NAME)) store.unregisterModule(STATS_STORE_MODULE_NAME)
-    })
-    const blankDeliveryReport = {
-      sent: 0,
-      waiting: 0,
-      queued: 0,
-      delivered: 0,
-      undelivered: 0,
-      failed: 0,
-      cancelled: 0,
-      total: 0,
-      units_used: 0,
-    }
-    const deliveryReport = ref(JSON.parse(JSON.stringify(blankDeliveryReport)))
-    const fetchDeliveryReport = () => {
-      store.dispatch('stats/fetchDeliveryReport', {
-        start: '2021-07-01',
-        end: '2021-10-06',
-        // org_id: JSON.parse(localStorage.getItem('userData')).membership.organisation_id,
-      })
-        .then(response => {
-          console.log('data', response)
-          deliveryReport.value = response.data
-        })
-    }
-    const refreshDeliveryReport = () => {
-      fetchDeliveryReport()
-    }
-    fetchDeliveryReport()
-    return {
-      fetchDeliveryReport,
-      deliveryReport,
-      refreshDeliveryReport,
-    }
+  props: {
+    deliveryReport: {
+      type: Object,
+      required: true,
+    },
   },
 }
 </script>

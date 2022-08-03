@@ -16,7 +16,7 @@ export default function useCampaign() {
     if (state === 3) return 'Paused'
     if (state === 4) return 'Sent'
     if (state === 5) return 'Draft'
-    if (state === 6) return 'Cancelled'
+    if (state === 6) return 'Stopped'
     return 'Sent'
   }
 

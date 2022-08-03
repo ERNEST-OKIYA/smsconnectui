@@ -49,11 +49,6 @@
               class="senders-filter-select"
               placeholder="Select Sender"
             >
-              <template #selected-option="{ label }">
-                <span class="text-truncate overflow-hidden">
-                  {{ label }}
-                </span>
-              </template>
             </v-select>
           </div>
         </b-col>
@@ -151,6 +146,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import {
   BCard, BRow, BCol,
   BFormInput, BTable, BSpinner,
@@ -198,7 +194,7 @@ export default {
     })
     const fetchSenders = () => {
       store
-        .dispatch('stoplists/fetchOrganisationSenders', { orgId: JSON.parse(localStorage.getItem('userData')).membership.organisation_id })
+        .dispatch('stoplists/fetchOrganisationSenders', { orgId: JSON.parse(JSON.stringify(Vue.$cookies.get('userData').membership.organisation_id)) })
         .then(response => {
           senderOptions.value = response.data.results
         })

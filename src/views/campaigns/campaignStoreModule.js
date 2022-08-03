@@ -22,6 +22,14 @@ export default {
           .catch(error => reject(error))
       })
     },
+    deleteCampaigns(ctx, payload) {
+      return new Promise((resolve, reject) => {
+        axios
+          .post('/campaigns/archive', payload)
+          .then(response => resolve(response))
+          .catch(error => reject(error))
+      })
+    },
     fetchGroup(ctx, { id }) {
       return new Promise((resolve, reject) => {
         axios
@@ -50,6 +58,14 @@ export default {
       return new Promise((resolve, reject) => {
         axios
           .get(`campaigns/${id}/progress`)
+          .then(response => resolve(response))
+          .catch(error => reject(error))
+      })
+    },
+    stopCampaign(ctx, { id }) {
+      return new Promise((resolve, reject) => {
+        axios
+          .get(`campaigns/${id}/stop`)
           .then(response => resolve(response))
           .catch(error => reject(error))
       })

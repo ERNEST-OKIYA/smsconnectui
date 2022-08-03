@@ -138,7 +138,7 @@ export default {
   },
   data() {
     return {
-      userData: JSON.parse(localStorage.getItem('userData')),
+      userData: JSON.parse(JSON.stringify(this.$cookies.get('userData'))),
       avatarText,
     }
   },
@@ -146,11 +146,11 @@ export default {
     logout() {
       // Remove userData from localStorage
       // ? You just removed token from localStorage. If you like, you can also make API call to backend to blacklist used token
-      localStorage.removeItem(useJwt.jwtConfig.storageTokenKeyName)
-      localStorage.removeItem(useJwt.jwtConfig.storageRefreshTokenKeyName)
+      this.$cookies.remove(useJwt.jwtConfig.storageTokenKeyName)
+      this.$cookies.remove(useJwt.jwtConfig.storageRefreshTokenKeyName)
 
       // Remove userData from localStorage
-      localStorage.removeItem('userData')
+      this.$cookies.remove('userData')
 
       // Reset ability
       this.$ability.update(initialAbility)

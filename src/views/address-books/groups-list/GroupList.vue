@@ -29,7 +29,7 @@
             class="per-page-selector d-inline-block ml-50 mr-1"
           />
           <b-button
-            variant="primary"
+            variant="danger"
             @click="isAddNewGroupSidebarActive = true"
           >
             <span  class="text-nowrap">Add New Group</span>
@@ -45,7 +45,7 @@
             <b-form-input
               v-model="searchQuery"
               class="d-inline-block mr-1"
-              placeholder="Search..."
+              placeholder="Search by Name..."
             />
             <!-- <v-select
               v-model="statusFilter"
@@ -82,11 +82,12 @@
       <template #cell(name)="data">
         <b-link
           :to="{ name: 'address-books-group-view', params: { id: data.item.id }}"
-          class="font-weight-bold"
+          class="text-bold text-secondary"
+          style="text-transform: uppercase;"
         >
         <feather-icon
                 icon="FolderPlusIcon"
-                class="text-success mr-1"
+                class="text-secondary mr-1"
                 size="18"
         />
           {{ data.value }}
@@ -110,7 +111,7 @@
         <template v-if="data.value >= 100">
           <b-badge
             pill
-            variant="light-success"
+            variant="dark"
           >
             {{ data.value }}
           </b-badge>
@@ -118,7 +119,7 @@
         <template v-else>
          <b-badge
             pill
-            variant="light-primary"
+            variant="dark"
           >
             {{ data.value }}
           </b-badge>
@@ -145,7 +146,6 @@
 
         <div class="text-nowrap">
           <b-button
-          variant="success"
           class="mr-1"
           @click="showCompose(data.item.id)"
           >

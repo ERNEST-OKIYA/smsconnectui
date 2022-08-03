@@ -4,10 +4,11 @@
 
       <!-- Brand logo-->
       <b-link class="brand-logo">
-        <vuexy-logo />
-        <h2 class="brand-text text-primary ml-1">
-          SWIFTT SMS
-        </h2>
+        <b-img
+          style="width:auto; height:100px"
+          :src="appLogoImage"
+          alt="logo"
+        />
       </b-link>
       <!-- /Brand logo-->
 
@@ -41,30 +42,29 @@
             class="mb-1 font-weight-bold"
             title-tag="h2"
           >
-            Welcome to SwifttDial SMS 👋
+            Welcome to SMS CONNECT 👋
           </b-card-title>
           <b-card-text class="mb-2">
             Please sign-in to your account and start the adventure
           </b-card-text>
-
           <b-alert
-            variant="primary"
+          v-if="errors"
+            variant="danger"
             show
           >
             <div class="alert-body font-small-2">
-              <!-- <p>
-                <small class="mr-50"><span class="font-weight-bold">Test Credentials:</span> me@swifftdial.com | qwertea21</small>
-              </p> -->
+              <p>
+                <small class="mr-50"><span class="font-weight-bold">* {{ error_message }} </span></small>
+              </p>
             </div>
             <feather-icon
               v-b-tooltip.hover.left="'This is just for ACL demo purpose'"
-              icon="HelpCircleIcon"
+              icon="AlertTriangleIcon"
               size="18"
               class="position-absolute"
               style="top: 10; right: 10;"
             />
           </b-alert>
-
           <!-- form -->
           <validation-observer
             ref="loginForm"
@@ -158,22 +158,22 @@
             </b-form>
           </validation-observer>
 
-          <b-card-text class="text-center mt-2">
+          <!-- <b-card-text class="text-center mt-2">
             <span>New on our platform? </span>
             <b-link :to="{name:'auth-register'}">
               <span>&nbsp;Create an account</span>
             </b-link>
-          </b-card-text>
+          </b-card-text> -->
 
           <!-- divider -->
-          <div class="divider my-2">
+          <!-- <div class="divider my-2">
             <div class="divider-text">
               or
             </div>
-          </div>
+          </div> -->
 
           <!-- social buttons -->
-          <div class="auth-footer-btn d-flex justify-content-center">
+          <!-- <div class="auth-footer-btn d-flex justify-content-center">
             <b-button
               variant="facebook"
               href="javascript:void(0)"
@@ -198,7 +198,7 @@
             >
               <feather-icon icon="GithubIcon" />
             </b-button>
-          </div>
+          </div> -->
         </b-col>
       </b-col>
     <!-- /Login-->
@@ -209,9 +209,10 @@
 <script>
 /* eslint-disable global-require */
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import VuexyLogo from '@core/layouts/components/Logo.vue'
+import { $themeConfig } from '@themeConfig'
+// import VuexyLogo from '@core/layouts/components/Logo.vue'
 import {
-  BRow, BCol, BLink, BFormGroup, BFormInput, BInputGroupAppend, BInputGroup, BFormCheckbox, BCardText, BCardTitle, BImg, BForm, BButton, BAlert, VBTooltip,
+  BRow, BCol, BLink, BFormGroup, BFormInput, BInputGroupAppend, BInputGroup, BFormCheckbox, BCardText, BCardTitle, BImg, BForm, BButton, VBTooltip, BAlert,
 } from 'bootstrap-vue'
 import useJwt from '@/auth/jwt/useJwt'
 import { required, email } from '@validations'
@@ -239,10 +240,10 @@ export default {
     BImg,
     BForm,
     BButton,
-    BAlert,
-    VuexyLogo,
+    // VuexyLogo,
     ValidationProvider,
     ValidationObserver,
+    BAlert,
   },
   mixins: [togglePasswordVisibility],
   data() {
@@ -255,6 +256,9 @@ export default {
       // validation rules
       required,
       email,
+      errors: false,
+      error_message: '',
+      appLogoImage: $themeConfig.app.appLogoImage,
     }
   },
   computed: {
@@ -279,30 +283,43 @@ export default {
             password: this.password,
           })
             .then(response => {
-              const { userData } = response.data
-              userData.ability = response.data.ability
-              userData.membership = response.data.membership
-              useJwt.setToken(response.data.tokens.access_token)
-              useJwt.setRefreshToken(response.data.tokens.refresh_token)
-              localStorage.setItem('userData', JSON.stringify(userData))
-              this.$ability.update(response.data.ability)
-              // ? This is just for demo purpose. Don't think CASL is role based in this case, we used role in if condition just for ease
-              this.$router.replace(getHomeRouteForLoggedInUser(userData.role))
-                .then(() => {
-                  this.$toast({
-                    component: ToastificationContent,
-                    position: 'top-right',
-                    props: {
-                      title: `Welcome ${userData.last_name || userData.email}`,
-                      icon: 'CoffeeIcon',
-                      variant: 'success',
-                      text: `You have successfully logged in as ${userData.role}. Now you can start to explore!`,
-                    },
+              /* eslint-disable brace-style */
+              if (response.data.errors) {
+                this.errors = true
+                this.error_message = response.data.errors
+                this.$cookies.remove('userData')
+              }
+              else {
+                this.$cookies.remove('userData')
+                const { userData } = response.data
+                userData.ability = response.data.ability
+                userData.membership = response.data.membership
+                userData.bulk_accounts = response.data.bulk_accounts
+                userData.tenantInfo = response.data.tenantInfo
+                useJwt.setToken(response.data.tokens.access_token)
+                useJwt.setRefreshToken(response.data.tokens.refresh_token)
+                this.$cookies.set('userData', userData, '2m')
+                this.$ability.update(response.data.ability)
+                console.log('UserData', JSON.parse(JSON.stringify(this.$cookies.get('userData'))))
+                // ? This is just for demo purpose. Don't think CASL is role based in this case, we used role in if condition just for ease
+                this.$router.replace(getHomeRouteForLoggedInUser(userData.role))
+                  .then(() => {
+                    this.$toast({
+                      component: ToastificationContent,
+                      position: 'top-right',
+                      props: {
+                        title: `Welcome ${userData.last_name || userData.email}`,
+                        icon: 'CoffeeIcon',
+                        variant: 'success',
+                        text: `You have successfully logged in as ${userData.role}. Now you can start to explore!`,
+                      },
+                    })
                   })
-                })
+              }
             })
             .catch(error => {
-              this.$refs.loginForm.setErrors(error.response.data.error)
+              console.log('Errror', error)
+              this.$refs.loginForm.setErrors('Error')
             })
         }
       })

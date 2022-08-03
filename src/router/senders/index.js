@@ -13,4 +13,22 @@ export default [
       ],
     },
   },
+  {
+    path: '/senders-apply',
+    name: 'senders-apply',
+    component: () => import('@/views/senders/senders-list/ApplyNew.vue'),
+    meta: {
+      pageTitle: 'Senders',
+      breadcrumb: [
+        {
+          text: 'Senders List',
+          to: { name: 'senders' },
+        },
+        {
+          text: 'Apply New',
+          active: true,
+        },
+      ],
+    },
+  },
 ]

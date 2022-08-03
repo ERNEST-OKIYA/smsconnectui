@@ -38,7 +38,7 @@
             <b-form-input
               v-model="searchQuery"
               class="d-inline-block mr-1"
-              placeholder="Search..."
+              placeholder="Search by recipient or message..."
             />
             <v-select
               v-model="statusFilter"
@@ -49,11 +49,6 @@
               class="outbox-filter-select"
               placeholder="Select Status"
             >
-              <template #selected-option="{ label }">
-                <span class="text-truncate overflow-hidden">
-                  {{ label }}
-                </span>
-              </template>
             </v-select>
           </div>
         </b-col>
@@ -87,7 +82,7 @@
           <b-button variant="success" @click="row.toggleDetails" class="mr-2">
           {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
       </b-button>
-        <b-dropdown
+        <!-- <b-dropdown
           variant="link"
           toggle-class="p-0"
           no-caret
@@ -108,7 +103,7 @@
             <feather-icon icon="EyeIcon" />
             <span class="align-middle ml-50">View Campaign</span>
           </b-dropdown-item>
-        </b-dropdown>
+        </b-dropdown> -->
         </div>
     </template>
       <!-- Column: SMS Count -->
@@ -255,14 +250,14 @@
 import {
   BCard, BRow, BCol,
   BFormInput, BTable, BSpinner,
-  BDropdown, BDropdownItem, BPagination,
+  BPagination,
   BTooltip, BBadge, BButton,
 } from 'bootstrap-vue'
 // import { avatarText } from '@core/utils/filter'
 import vSelect from 'vue-select'
 import { onUnmounted } from '@vue/composition-api'
 import store from '@/store'
-import { formatDateToMonthLong, title } from '@utils/filters'
+import { title, formatDateToMonthLong } from '@utils/filters'
 import useOutboxList from './useOutboxList'
 
 import outBoxStoreModule from '../outBoxStoreModule'
@@ -281,8 +276,8 @@ export default {
     // BAvatar,
     // BLink,
     // BBadge,
-    BDropdown,
-    BDropdownItem,
+    // BDropdown,
+    // BDropdownItem,
     BPagination,
     BTooltip,
 
@@ -350,6 +345,7 @@ export default {
       statusOptions,
       isBusy,
       formatDateToMonthLong,
+      // formatDateToMonthLong,
       title,
 
       // avatarText,

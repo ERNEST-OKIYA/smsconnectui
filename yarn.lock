@@ -5006,6 +5006,11 @@ inquirer@^7.0.0, inquirer@^7.1.0:
     strip-ansi "^6.0.0"
     through "^2.3.6"
 
+install@^0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/install/-/install-0.13.0.tgz#6af6e9da9dd0987de2ab420f78e60d9c17260776"
+  integrity sha512-zDml/jzr2PKU9I8J/xyZBQn8rPCAY//UOYNmR01XwNwyfhEWObo2SWfSl1+0tm1u6PhxLwDnfsT/6jB7OUxqFA==
+
 internal-ip@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/internal-ip/-/internal-ip-4.3.0.tgz#845452baad9d2ca3b69c635a137acb9a0dad0907"
@@ -9058,6 +9063,11 @@ vue-context@6.0.0:
   integrity sha512-x8gO6xgj0MtTCWcYbDjO/7VJ/gT+nV+unqICvsN0hwqqBzft31eYyExYqrSvfDCRI7ixxObu5tbl7BQAKge7eg==
   dependencies:
     vue-clickaway "^2.2.2"
+
+vue-cookies@^1.7.4:
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/vue-cookies/-/vue-cookies-1.7.4.tgz#d241d0a0431da0795837651d10b4d73e7c8d3e8d"
+  integrity sha512-mOS5Btr8V9zvAtkmQ7/TfqJIropOx7etDAgBywPCmHjvfJl2gFbH2XgoMghleLoyyMTi5eaJss0mPN7arMoslA==
 
 vue-demi@latest:
   version "0.9.1"

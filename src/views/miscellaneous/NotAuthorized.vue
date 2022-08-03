@@ -3,7 +3,7 @@
     <b-link class="brand-logo">
       <vuexy-logo />
       <h2 class="brand-text text-primary ml-1">
-        SWIFTT SMS
+        MTRACK SMS
       </h2>
     </b-link>
 
@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     loginRoute() {
-      const user = JSON.parse(localStorage.getItem('userData'))
+      const user = JSON.parse(JSON.stringify(this.$cookies.get('userData')))
       return getHomeRouteForLoggedInUser(user ? user.role : null)
     },
   },

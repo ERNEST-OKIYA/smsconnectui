@@ -3,6 +3,15 @@ export default [
     path: '/address-books/groups',
     name: 'address-books-groups',
     component: () => import('@/views/address-books/groups-list/GroupList.vue'),
+    meta: {
+      pageTitle: 'Address Books',
+      breadcrumb: [
+        {
+          text: 'Contact Groups',
+          active: true,
+        },
+      ],
+    },
   },
   {
     path: '/address-books:group/contacts',

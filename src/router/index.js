@@ -10,6 +10,8 @@ import dashboard from './dashboard'
 import outbox from './outbox'
 import senders from './senders'
 import stoplist from './stoplist'
+import topups from './topups'
+import payments from './payments'
 
 Vue.use(VueRouter)
 
@@ -28,6 +30,8 @@ const router = new VueRouter({
     ...outbox,
     ...senders,
     ...stoplist,
+    ...topups,
+    ...payments,
     {
       path: '*',
       redirect: 'error-404',

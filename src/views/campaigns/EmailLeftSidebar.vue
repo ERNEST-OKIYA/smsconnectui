@@ -6,9 +6,9 @@
           <div class="form-group-compose text-center compose-btn">
             <b-button
               v-ripple.400="'rgba(255, 255, 255, 0.15)'"
-              variant="primary"
+              variant="danger"
               block
-              @click="$emit('update:shall-show-email-compose-modal', true); $emit('close-left-sidebar')"
+              @click="$emit('update:shall-show-email-compose-modal', true); $emit('close-left-sidebar'); $emit('close-campaign-progress')"
             >
               Create Bulk Campaign
             </b-button>
@@ -80,8 +80,14 @@ import VuePerfectScrollbar from 'vue-perfect-scrollbar'
 import {
   BButton, BListGroup, BListGroupItem, BBadge,
 } from 'bootstrap-vue'
+import store from '@/store'
+import {
+  onUnmounted,
+  // ref, watch, computed, onUnmounted,
+} from '@vue/composition-api'
 import { isDynamicRouteActive } from '@core/utils/utils'
 import Ripple from 'vue-ripple-directive'
+import campaignStoreModule from './campaignStoreModule'
 
 export default {
   directives: {
@@ -109,6 +115,15 @@ export default {
     },
   },
   setup() {
+    const CAMPAIGNS_STORE_MODULE_NAME = 'campaigns'
+    // Register module
+    if (!store.hasModule(CAMPAIGNS_STORE_MODULE_NAME)) store.registerModule(CAMPAIGNS_STORE_MODULE_NAME, campaignStoreModule)
+
+    // UnRegister on leave
+    onUnmounted(() => {
+      if (store.hasModule(CAMPAIGNS_STORE_MODULE_NAME)) store.unregisterModule(CAMPAIGNS_STORE_MODULE_NAME)
+    })
+
     const perfectScrollbarSettings = {
       maxScrollbarLength: 60,
     }
@@ -117,9 +132,9 @@ export default {
       { title: 'Waiting', icon: 'LoaderIcon', route: { name: 'bulk-campaigns-state', params: { state: 0 } } },
       { title: 'Queued', icon: 'ClockIcon', route: { name: 'bulk-campaigns-state', params: { state: 1 } } },
       { title: 'Scheduled', icon: 'CalendarIcon', route: { name: 'bulk-campaigns-state', params: { state: 2 } } },
-      { title: 'Cancelled', icon: 'XCircleIcon', route: { name: 'bulk-campaigns-state', params: { state: 6 } } },
+      { title: 'Stopped', icon: 'XCircleIcon', route: { name: 'bulk-campaigns-state', params: { state: 6 } } },
       { title: 'Draft', icon: 'Edit2Icon', route: { name: 'bulk-campaigns-state', params: { state: 5 } } },
-      { title: 'Paused', icon: 'PauseCircleIcon', route: { name: 'bulk-campaigns-state', params: { state: 3 } } },
+      // { title: 'Paused', icon: 'PauseCircleIcon', route: { name: 'bulk-campaigns-state', params: { state: 3 } } },
     ]
 
     const emailLabel = [
@@ -151,6 +166,7 @@ export default {
       if (filter === 'Draft') return 'light-secondary'
       if (filter === 'Scheduled') return 'light-secondary'
       if (filter === 'Paused') return 'light-info'
+      if (filter === 'Stopped') return 'light-danger'
       if (filter === 'Waiting') return 'light-secondary'
       if (filter === 'Queued') return 'light-warning'
       return 'light-primary'

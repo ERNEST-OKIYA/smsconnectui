@@ -22,10 +22,12 @@
             class="per-page-selector d-inline-block ml-50 mr-1"
           />
           <!-- <b-button
-            variant="primary"
-            @click="isAddNewSenderSidebarActive = true"
-          >
-            <span  class="text-nowrap">Add New Sender</span>
+              v-ripple.400="'rgba(113, 102, 240, 0.15)'"
+              variant="primary"
+              :to="{ name: 'senders-apply' }"
+              class=""
+            >
+              <span class="text-nowrap">Apply New</span>
           </b-button> -->
         </b-col>
 
@@ -49,11 +51,6 @@
               class="senders-filter-select"
               placeholder="Select Type"
             >
-              <template #selected-option="{ label }">
-                <span class="text-truncate overflow-hidden">
-                  {{ label }}
-                </span>
-              </template>
             </v-select>
           </div>
         </b-col>
@@ -98,6 +95,26 @@
           >
           <p class="mb-0">
             Notes: {{ data.item.type_name }}
+          </p>
+        </b-tooltip>
+        </span>
+      </template>
+      <template #cell(status)="data">
+        <span class="text-nowrap">
+          <b-badge
+          :id="`senders-row-${data.item.id}-status`"
+          :variant="resolveSenderStatusVariantAndIcon(data.item.status).variant"
+          >
+          {{ data.item.status }}
+          </b-badge>
+          <b-tooltip
+            title="Type"
+            class="cursor-pointer"
+            :target="`senders-row-${data.item.id}-status`"
+            placement="topright"
+          >
+          <p class="mb-0">
+            Notes: {{ data.item.status }}
           </p>
         </b-tooltip>
         </span>
@@ -246,6 +263,7 @@ export default {
       isSortDirDesc,
       refSenderListTable,
       resolveSenderTypeVariantAndIcon,
+      resolveSenderStatusVariantAndIcon,
 
       typeFilter,
 
@@ -268,6 +286,7 @@ export default {
       isSortDirDesc,
       refSenderListTable,
       resolveSenderTypeVariantAndIcon,
+      resolveSenderStatusVariantAndIcon,
 
       typeFilter,
 
