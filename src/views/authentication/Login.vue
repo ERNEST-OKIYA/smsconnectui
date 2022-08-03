@@ -90,7 +90,7 @@
                     v-model="userEmail"
                     :state="errors.length > 0 ? false:null"
                     name="login-email"
-                    placeholder="john@example.com"
+                    placeholder=""
                   />
                   <small class="text-danger">{{ errors[0] }}</small>
                 </validation-provider>
@@ -257,7 +257,7 @@ export default {
       required,
       email,
       errors: false,
-      error_message: '',
+      error_message: 'invalid password',
       appLogoImage: $themeConfig.app.appLogoImage,
     }
   },
