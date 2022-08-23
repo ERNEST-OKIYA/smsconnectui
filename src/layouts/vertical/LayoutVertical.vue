@@ -10,7 +10,7 @@
             class="ml-25"
             href="#"
             target="_blank"
-          >MTRACK SMS</b-link>
+          >SMS CONNECT</b-link>
           <span class="d-none d-sm-inline-block">, All rights Reserved</span>
         </span>
 
