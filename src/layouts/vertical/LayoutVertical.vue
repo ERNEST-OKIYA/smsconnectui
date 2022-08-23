@@ -10,11 +10,7 @@
             class="ml-25"
             href="#"
             target="_blank"
-<<<<<<< HEAD
           >SMS CONNECT</b-link>
-=======
-          >SmsConnect SMS</b-link>
->>>>>>> 5c31a54c25b442eb4349a060fa598e61256e3a13
           <span class="d-none d-sm-inline-block">, All rights Reserved</span>
         </span>
 
