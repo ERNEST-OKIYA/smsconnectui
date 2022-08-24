@@ -10,7 +10,7 @@ const axiosIns = axios.create({
   baseURL: 'https://app.smsconnect.co.ke:2777/api/',
   // baseURL: 'https://sandbox.mtrackltd.co.ke:2777/api/',
   // baseURL: 'https://bulkdev.swifttdial.com:2778/api/',
-  timeout: 5000,
+  timeout: 50000,
   // headers: {'X-Custom-Header': 'foobar'}
 })
 
